@@ -1,0 +1,15 @@
+.claude/
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite
+instance/
+.env
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.idea/
+.vscode/
+*.log
