@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block sidebar %}{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Notifications</span>
+    </div>
+    <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="notif-page" data-aos="fade-up">
+    <h2><i class="fa-solid fa-bell"></i> Notifications</h2>
+
+    {% for n in notifications %}
+        <a href="{{ n.link or '#' }}" class="notif-item {% if not n.read %}notif-unread{% endif %}">
+            <i class="fa-solid {% if n.type == 'answer' %}fa-comment{% elif n.type == 'upvote' %}fa-arrow-up{% elif n.type == 'welcome' %}fa-hand-wave{% else %}fa-bell{% endif %}"></i>
+            <div>
+                <p>{{ n.message }}</p>
+                <span class="meta-text">{{ n.created_at.strftime('%d %b %Y at %H:%M') }}</span>
+            </div>
+        </a>
+    {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-bell-slash fa-3x"></i>
+            <h3>No notifications yet</h3>
+            <p>You will be notified when someone answers your questions or upvotes your responses.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

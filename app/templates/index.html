@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="home-feed">
+    <!-- HERO -->
+    {% if not request.args.get('page') or request.args.get('page') == '1' %}
+    <div class="home-hero" data-aos="fade-up">
+        <div class="hero-content">
+            <p class="hero-tagline">Your Health, Your Questions</p>
+            <h1>Health answers you can trust</h1>
+            <p>Ask questions, share experiences, and find answers from NHS-verified sources, AI guidance, and real human experiences.</p>
+            <div class="hero-stats-row">
+                <div class="hero-stat"><strong>{{ stats.total_questions }}</strong> Questions</div>
+                <div class="hero-stat"><strong>{{ stats.total_answers }}</strong> Answers</div>
+                <div class="hero-stat"><strong>{{ stats.total_users }}</strong> Members</div>
+                <div class="hero-stat"><strong><i class="fa-solid fa-robot"></i></strong> AI Powered</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DAILY PROMPT -->
+    <div class="daily-prompt" data-aos="fade-up" data-aos-delay="100">
+        <div class="prompt-icon"><i class="fa-solid fa-lightbulb"></i></div>
+        <div class="prompt-content">
+            <span class="prompt-label">Today's Question</span>
+            <p>{{ daily_prompt }}</p>
+        </div>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('questions.ask') }}" class="btn btn-glow btn-sm">Share Your Answer</a>
+        {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-glow btn-sm">Join to Answer</a>
+        {% endif %}
+    </div>
+
+    <!-- UNANSWERED CALLOUT -->
+    {% if stats.unanswered_count > 0 %}
+    <div class="unanswered-callout" data-aos="fade-up" data-aos-delay="150">
+        <i class="fa-solid fa-hand-holding-heart"></i>
+        <span><strong>{{ stats.unanswered_count }} questions</strong> are waiting for human experiences. Can you help?</span>
+        <a href="?sort=unanswered" class="btn btn-outline btn-sm">View Unanswered</a>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- SORT TABS -->
+    <div class="feed-header" data-aos="fade-up">
+        <div class="sort-tabs">
+            <a href="?sort=recent" class="sort-tab {% if sort == 'recent' %}active{% endif %}">
+                <i class="fa-solid fa-clock"></i> Recent
+            </a>
+            <a href="?sort=trending" class="sort-tab {% if sort == 'trending' %}active{% endif %}">
+                <i class="fa-solid fa-fire"></i> Trending
+            </a>
+            <a href="?sort=unanswered" class="sort-tab {% if sort == 'unanswered' %}active{% endif %}">
+                <i class="fa-solid fa-hand-holding-heart"></i> Needs Answers
+            </a>
+        </div>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('questions.ask') }}" class="btn btn-glow">
+                <i class="fa-solid fa-plus"></i> Ask Question
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- QUESTION CARDS -->
+    {% for question in questions.items %}
+        <div class="question-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 20 }}">
+            <div class="question-stats">
+                <div class="stat-pill {% if question.answer_count > 1 %}has-answers{% endif %}">
+                    <i class="fa-solid fa-comment"></i> {{ question.answer_count }}
+                </div>
+                <div class="stat-pill">
+                    <i class="fa-solid fa-eye"></i> {{ question.view_count }}
+                </div>
+            </div>
+            <div class="question-content">
+                <h3><a href="{{ url_for('questions.detail', id=question.id) }}">{{ question.title }}</a></h3>
+                <p class="question-preview">{{ question.body[:120] }}{% if question.body|length > 120 %}...{% endif %}</p>
+                <div class="question-meta">
+                    {% if question.is_official %}
+                        <span class="badge badge-nhs"><i class="fa-solid fa-shield-check"></i> {{ question.source }}</span>
+                    {% endif %}
+                    <span class="badge badge-category">{{ question.category.name }}</span>
+                    <span class="meta-text">
+                        <a href="{{ url_for('users.profile', id=question.author.id) }}">{{ question.author.full_name }}</a>
+                        &bull; {{ question.created_at.strftime('%d %b %Y') }}
+                    </span>
+                </div>
+            </div>
+            <div class="question-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+    {% else %}
+        <div class="empty-state" data-aos="fade-up">
+            <i class="fa-solid fa-comment-medical fa-3x"></i>
+            <h3>No questions yet</h3>
+            <p>Be the first to ask a health question!</p>
+        </div>
+    {% endfor %}
+
+    {% if questions.has_next or questions.has_prev %}
+        <div class="pagination" data-aos="fade-up">
+            {% if questions.has_prev %}<a href="?sort={{ sort }}&page={{ questions.prev_num }}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Previous</a>{% endif %}
+            <span class="page-info">Page {{ questions.page }} of {{ questions.pages }}</span>
+            {% if questions.has_next %}<a href="?sort={{ sort }}&page={{ questions.next_num }}" class="btn btn-outline">Next <i class="fa-solid fa-arrow-right"></i></a>{% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

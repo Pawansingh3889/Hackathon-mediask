@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}{{ question.title }}{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <a href="{{ url_for('main.category', slug=question.category.slug) }}">{{ question.category.name }}</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Question</span>
+    </div>
+    <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page" data-aos="fade-up">
+    <!-- QUESTION -->
+    <div class="detail-question">
+        <div class="detail-question-header">
+            <h1>{{ question.title }}</h1>
+            <div class="question-meta">
+                {% if question.is_official %}
+                    <span class="badge badge-official"><i class="fa-solid fa-check-circle"></i> {{ question.source }}</span>
+                {% endif %}
+                <span class="badge badge-category">{{ question.category.name }}</span>
+                <span class="meta-text">
+                    Asked by
+                    <a href="{{ url_for('users.profile', id=question.author.id) }}">{{ question.author.full_name }}</a>
+                    &bull; {{ question.created_at.strftime('%d %b %Y') }}
+                    &bull; <i class="fa-solid fa-eye"></i> {{ question.view_count }} views
+                </span>
+            </div>
+        </div>
+        <div class="detail-question-body">
+            {{ question.body }}
+            {% if question.source_url %}
+                <a href="{{ question.source_url }}" target="_blank" rel="noopener" class="source-link">
+                    <i class="fa-solid fa-external-link"></i> View original source
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ANSWERS -->
+    <div class="answers-section" data-aos="fade-up">
+        <div class="answers-header">
+            <h2><i class="fa-solid fa-comments"></i> {{ answers|length }} Answer{{ 's' if answers|length != 1 }}</h2>
+        </div>
+
+        {% for answer in answers %}
+            <div class="answer-card" id="answer-{{ answer.id }}" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                <div class="vote-controls" data-answer-id="{{ answer.id }}">
+                    <button class="vote-btn upvote" onclick="vote({{ answer.id }}, 1)" title="Helpful">
+                        <i class="fa-solid fa-caret-up"></i>
+                    </button>
+                    <span class="vote-score">{{ answer.score }}</span>
+                    <button class="vote-btn downvote" onclick="vote({{ answer.id }}, -1)" title="Not helpful">
+                        <i class="fa-solid fa-caret-down"></i>
+                    </button>
+                </div>
+                <div class="answer-content">
+                    <!-- AUTHENTICITY BADGE -->
+                    {% set badge_label, badge_icon, badge_class = answer.auth_badge %}
+                    <div class="auth-badge-row">
+                        <span class="badge {{ badge_class }}"><i class="fa-solid {{ badge_icon }}"></i> {{ badge_label }}</span>
+                    </div>
+                    <div class="answer-body">{{ answer.body }}</div>
+                    <div class="answer-footer">
+                        <div class="answer-author">
+                            <div class="avatar-sm {% if answer.auth_level == 'ai_assistant' %}avatar-ai{% elif answer.auth_level == 'nhs_verified' %}avatar-nhs{% endif %}">
+                                {% if answer.auth_level == 'ai_assistant' %}<i class="fa-solid fa-robot"></i>{% else %}{{ answer.author.first_name[0] }}{% endif %}
+                            </div>
+                            <div>
+                                <a href="{{ url_for('users.profile', id=answer.author.id) }}" class="author-name">
+                                    {{ answer.author.full_name }}
+                                </a>
+                                <span class="meta-text">{{ answer.created_at.strftime('%d %b %Y') }}</span>
+                            </div>
+                        </div>
+                        {% if answer.source_url %}
+                            <a href="{{ answer.source_url }}" target="_blank" rel="noopener" class="source-link">
+                                <i class="fa-solid fa-external-link"></i> Source
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- POST ANSWER -->
+    {% if current_user.is_authenticated %}
+        <div class="answer-form" data-aos="fade-up">
+            <h3><i class="fa-solid fa-pen"></i> Your Answer</h3>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.body(class="form-control", rows=5, placeholder="Share your knowledge or experience...") }}
+                    {% for error in form.body.errors %}
+                        <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {{ form.submit(class="btn btn-glow") }}
+            </form>
+        </div>
+    {% else %}
+        <div class="auth-prompt" data-aos="fade-up">
+            <i class="fa-solid fa-lock"></i>
+            <p><a href="{{ url_for('auth.login') }}">Sign in</a> to share your answer</p>
+        </div>
+    {% endif %}
+
+    <!-- RELATED QUESTIONS -->
+    {% set related = question.get_related(5) %}
+    {% if related %}
+    <div class="related-section" data-aos="fade-up">
+        <h3><i class="fa-solid fa-link"></i> Related Questions</h3>
+        {% for rq in related %}
+            <a href="{{ url_for('questions.detail', id=rq.id) }}" class="related-link">
+                <span>{{ rq.title }}</span>
+                <span class="meta-text">{{ rq.answer_count }} answers</span>
+            </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrfToken = '{{ csrf_token() }}';
+</script>
+{% endblock %}

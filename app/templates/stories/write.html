@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Write Your Story{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <a href="{{ url_for('stories.index') }}">Stories</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Write</span>
+    </div>
+    <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="form-container" data-aos="fade-up">
+    <h2><i class="fa-solid fa-pen-fancy"></i> Share Your Health Journey</h2>
+    <p class="meta-text" style="margin-bottom:1.5rem;">Your experience could help someone else going through the same thing. Write openly — this community is here to support you.</p>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.title.label }}
+            {{ form.title(class="form-control", placeholder="e.g. How I managed my anxiety without medication") }}
+            {% for error in form.title.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.category_id.label }}
+            {{ form.category_id(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.body.label }}
+            {{ form.body(class="form-control", rows=12, placeholder="Tell your story. What happened? How did you cope? What would you tell someone going through the same thing?") }}
+            {% for error in form.body.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+        </div>
+        {{ form.submit(class="btn btn-glow btn-full") }}
+    </form>
+</div>
+{% endblock %}

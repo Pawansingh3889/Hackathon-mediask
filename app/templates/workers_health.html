@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Workers Health Hub{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Workers Health</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+<div class="mh-page">
+    <section class="mh-hero" data-aos="fade-up" style="background:linear-gradient(135deg, #0369a1, #0ea5e9, #38bdf8);">
+        <div class="mh-hero-bg">
+            <div class="mh-hero-orb orb-1" style="background:#0284c7;"></div>
+            <div class="mh-hero-orb orb-2" style="background:#7dd3fc;"></div>
+            <div class="mh-hero-orb orb-3" style="background:#0369a1;"></div>
+        </div>
+        <div class="mh-hero-content">
+            <div class="mh-hero-badge"><i class="fa-solid fa-hard-hat"></i> Workers Health Hub</div>
+            <h1>Your body works hard.<br>Take care of it.</h1>
+            <p>Health guidance for factory workers, food processors, and manual labourers. Know your rights, protect your body, look after your mind. Sourced from NHS, WHO, CDC, and global health authorities.</p>
+            <div class="mh-hero-actions">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('questions.ask') }}" class="btn btn-glow btn-lg"><i class="fa-solid fa-plus"></i> Ask a Question</a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-glow btn-lg"><i class="fa-solid fa-user-plus"></i> Join the Community</a>
+                {% endif %}
+                <a href="{{ url_for('workplace.index') }}" class="btn btn-glass btn-lg"><i class="fa-solid fa-building-user"></i> Workplace Support</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mh-stats" data-aos="fade-up" data-aos-delay="100">
+        <div class="stat-card"><div class="stat-number">{{ stats.total_questions }}</div><div class="stat-label">Worker Health Questions</div></div>
+        <div class="stat-card"><div class="stat-number">{{ stats.total_users }}</div><div class="stat-label">Community Members</div></div>
+        <div class="stat-card"><div class="stat-number">6</div><div class="stat-label">Global Health Sources</div></div>
+        <div class="stat-card"><div class="stat-number"><i class="fa-solid fa-scale-balanced"></i></div><div class="stat-label">Know Your Rights</div></div>
+    </section>
+
+    <section class="mh-topics" data-aos="fade-up" data-aos-delay="200">
+        <h2>Common Factory Worker Issues</h2>
+        <div class="topic-grid">
+            <a href="{{ url_for('main.search', q='back pain lifting') }}" class="topic-card" style="background:linear-gradient(135deg,#dc2626,#f87171);">
+                <i class="fa-solid fa-person-walking-with-cane"></i><span>Back Pain & Lifting</span>
+            </a>
+            <a href="{{ url_for('main.search', q='cold room') }}" class="topic-card" style="background:linear-gradient(135deg,#0284c7,#38bdf8);">
+                <i class="fa-solid fa-temperature-low"></i><span>Cold Exposure</span>
+            </a>
+            <a href="{{ url_for('main.search', q='repetitive strain') }}" class="topic-card" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
+                <i class="fa-solid fa-hand"></i><span>Repetitive Strain</span>
+            </a>
+            <a href="{{ url_for('main.search', q='shift work sleep') }}" class="topic-card" style="background:linear-gradient(135deg,#4338ca,#818cf8);">
+                <i class="fa-solid fa-moon"></i><span>Shift Work & Sleep</span>
+            </a>
+            <a href="{{ url_for('main.search', q='sick pay rights') }}" class="topic-card" style="background:linear-gradient(135deg,#059669,#34d399);">
+                <i class="fa-solid fa-scale-balanced"></i><span>Your Legal Rights</span>
+            </a>
+            <a href="{{ url_for('main.search', q='skin dermatitis chemical') }}" class="topic-card" style="background:linear-gradient(135deg,#ea580c,#fb923c);">
+                <i class="fa-solid fa-hand-dots"></i><span>Skin & Chemical</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="crisis-banner" data-aos="fade-up" data-aos-delay="250" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#6ee7b7;">
+        <div class="crisis-icon" style="color:#059669;"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div class="crisis-text" style="color:#065f46;">
+            <strong>Know your rights:</strong>
+            <span>Your employer MUST provide: PPE, rest breaks, and a safe workplace. If you notice unsafe conditions, <strong>inform your office management first</strong> so they can fix it immediately.</span>
+            <br>
+            <button onclick="document.getElementById('hazardModal').style.display='block'" class="btn-report">
+              ⚠️ Report a Hazard to Management
+            </button>
+        </div>
+    </section>
+
+    <div id="hazardModal" class="modal">
+      <div class="modal-content">
+        <span onclick="document.getElementById('hazardModal').style.display='none'" class="close-btn">&times;</span>
+        <h2>Health & Safety Incident Report</h2>
+        <p>Submit this directly to office management to resolve an on-site issue.</p>
+        
+        <form action="/submit-hazard" method="POST">
+          <label for="name">Your Name:</label>
+          <input type="text" id="name" name="name" required placeholder="John Doe">
+
+          <label for="department">Department / Area:</label>
+          <input type="text" id="department" name="department" required placeholder="e.g., Warehouse Bay 3">
+
+          <label for="description">Hazard Description:</label>
+          <textarea id="description" name="description" rows="4" required placeholder="Describe what is unsafe..."></textarea>
+
+          <button type="submit" class="btn-submit">Submit Report</button>
+        </form>
+      </div>
+    </div>
+
+    <section class="mh-feed" data-aos="fade-up">
+        <h2><i class="fa-solid fa-comments" style="color:#0369a1;"></i> Latest Questions</h2>
+        {% for question in questions.items %}
+            <div class="question-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
+                <div class="question-stats">
+                    <div class="stat-pill {% if question.answer_count > 0 %}has-answers{% endif %}"><i class="fa-solid fa-comment"></i> {{ question.answer_count }}</div>
+                    <div class="stat-pill"><i class="fa-solid fa-eye"></i> {{ question.view_count }}</div>
+                </div>
+                <div class="question-content">
+                    <h3><a href="{{ url_for('questions.detail', id=question.id) }}">{{ question.title }}</a></h3>
+                    <p class="question-preview">{{ question.body[:150] }}{% if question.body|length > 150 %}...{% endif %}</p>
+                    <div class="question-meta">
+                        {% if question.is_official %}<span class="badge badge-nhs"><i class="fa-solid fa-shield-check"></i> {{ question.source }}</span>{% endif %}
+                        <span class="badge badge-category">{{ question.category.name }}</span>
+                        <span class="meta-text">{{ question.author.full_name }} &bull; {{ question.created_at.strftime('%d %b %Y') }}</span>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state"><i class="fa-solid fa-hard-hat fa-3x"></i><h3>No questions yet</h3><p>Be the first factory worker to ask a question.</p></div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

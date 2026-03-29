@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ user.full_name }}{% endblock %}
+{% block sidebar %}{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>{{ user.full_name }}</span>
+    </div>
+    <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page" data-aos="fade-up">
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+        <div class="avatar-placeholder">{{ user.first_name[0] }}{{ user.last_name[0] }}</div>
+        <div class="profile-info">
+            <h1>{{ user.full_name }}</h1>
+            {% if user.bio %}<p class="meta-text">{{ user.bio }}</p>{% endif %}
+            <p class="meta-text">Member since {{ user.created_at.strftime('%B %Y') }}</p>
+        </div>
+    </div>
+
+    <!-- REPUTATION CARD -->
+    <div class="rep-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="rep-level">
+            <i class="fa-solid {{ user.level.icon }}" style="color:{{ user.level.color }};font-size:1.8rem;"></i>
+            <div>
+                <div class="rep-level-name" style="color:{{ user.level.color }};">{{ user.level.name }}</div>
+                <div class="rep-points">{{ user.reputation_points }} reputation points</div>
+            </div>
+        </div>
+        <div class="rep-stats-row">
+            <div class="rep-stat">
+                <strong>{{ questions|length }}</strong>
+                <span>Questions</span>
+            </div>
+            <div class="rep-stat">
+                <strong>{{ answers|length }}</strong>
+                <span>Answers</span>
+            </div>
+            <div class="rep-stat">
+                <strong>{{ user.streak_days }}</strong>
+                <span>Day Streak <i class="fa-solid fa-fire" style="color:#f59e0b;"></i></span>
+            </div>
+        </div>
+        {% if user.next_level %}
+        <div class="rep-progress">
+            <div class="rep-progress-label">
+                <span>Next: {{ user.next_level.name }}</span>
+                <span>{{ user.reputation_points }}/{{ user.next_level.min_pts }}</span>
+            </div>
+            <div class="rep-progress-bar">
+                <div class="rep-progress-fill" style="width:{{ user.next_level.progress }}%;"></div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- QUESTIONS -->
+    <div class="profile-content" data-aos="fade-up" data-aos-delay="150">
+        <h2>Questions Asked ({{ questions|length }})</h2>
+        {% for q in questions %}
+            <div class="question-card compact">
+                <h3><a href="{{ url_for('questions.detail', id=q.id) }}">{{ q.title }}</a></h3>
+                <span class="meta-text">{{ q.created_at.strftime('%d %b %Y') }} &bull; {{ q.answer_count }} answers</span>
+            </div>
+        {% else %}
+            <p class="meta-text">No questions yet.</p>
+        {% endfor %}
+
+        <h2>Answers Given ({{ answers|length }})</h2>
+        {% for a in answers %}
+            <div class="question-card compact">
+                <p>{{ a.body[:150] }}{% if a.body|length > 150 %}...{% endif %}</p>
+                <span class="meta-text">
+                    on <a href="{{ url_for('questions.detail', id=a.question_id) }}">{{ a.question.title[:80] }}</a>
+                    &bull; Score: {{ a.score }}
+                </span>
+            </div>
+        {% else %}
+            <p class="meta-text">No answers yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

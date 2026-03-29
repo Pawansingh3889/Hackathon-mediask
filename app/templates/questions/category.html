@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ current_category.name }}{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>{{ current_category.name }}</span>
+    </div>
+    <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="home-feed">
+    <div class="feed-header" data-aos="fade-up">
+        <div>
+            <h2><i class="fa-solid {{ current_category.icon or 'fa-tag' }}"></i> {{ current_category.name }}</h2>
+            {% if current_category.description %}
+                <p class="meta-text">{{ current_category.description }}</p>
+            {% endif %}
+        </div>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('questions.ask') }}" class="btn btn-glow"><i class="fa-solid fa-plus"></i> Ask</a>
+        {% endif %}
+    </div>
+
+    {% for question in questions.items %}
+        <div class="question-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
+            <div class="question-stats">
+                <div class="stat-pill {% if question.answer_count > 0 %}has-answers{% endif %}">
+                    <i class="fa-solid fa-comment"></i> {{ question.answer_count }}
+                </div>
+                <div class="stat-pill">
+                    <i class="fa-solid fa-eye"></i> {{ question.view_count }}
+                </div>
+            </div>
+            <div class="question-content">
+                <h3><a href="{{ url_for('questions.detail', id=question.id) }}">{{ question.title }}</a></h3>
+                <div class="question-meta">
+                    {% if question.is_official %}
+                        <span class="badge badge-official"><i class="fa-solid fa-check-circle"></i> {{ question.source }}</span>
+                    {% endif %}
+                    <span class="meta-text">by {{ question.author.full_name }} &bull; {{ question.created_at.strftime('%d %b %Y') }}</span>
+                </div>
+            </div>
+            <div class="question-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+    {% else %}
+        <div class="empty-state" data-aos="fade-up">
+            <i class="fa-solid fa-comment-medical fa-3x"></i>
+            <h3>No questions yet</h3>
+            <p>Be the first to ask about {{ current_category.name }}.</p>
+            <a href="{{ url_for('questions.ask') }}" class="btn btn-glow">Ask a Question</a>
+        </div>
+    {% endfor %}
+
+    {% if questions.has_next or questions.has_prev %}
+        <div class="pagination">
+            {% if questions.has_prev %}<a href="?page={{ questions.prev_num }}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Previous</a>{% endif %}
+            <span class="page-info">Page {{ questions.page }} of {{ questions.pages }}</span>
+            {% if questions.has_next %}<a href="?page={{ questions.next_num }}" class="btn btn-outline">Next <i class="fa-solid fa-arrow-right"></i></a>{% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="question-detail">
+    <div class="question-header">
+        <h1>{{ post.title }}</h1>
+        <div class="question-meta">
+            <span class="badge badge-topic">{{ post.topic }}</span>
+            <span class="meta-text">
+                by {{ post.author.full_name }} on {{ post.created_at.strftime('%d %b %Y') }}
+            </span>
+        </div>
+    </div>
+    <div class="question-body">{{ post.body }}</div>
+
+    <hr>
+
+    <h2>{{ comments|length }} Response{{ 's' if comments|length != 1 }}</h2>
+
+    {% for comment in comments %}
+        <div class="answer-card">
+            <div class="answer-content">
+                <div class="answer-body">{{ comment.body }}</div>
+                <div class="answer-meta">
+                    <span class="meta-text">
+                        {{ comment.author.full_name }} &middot;
+                        {{ comment.created_at.strftime('%d %b %Y') }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if current_user.is_authenticated %}
+        <div class="answer-form">
+            <h3>Your Response</h3>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.body(class="form-control", rows=4, placeholder="Offer support or share your thoughts...") }}
+                </div>
+                {{ form.submit(class="btn btn-ask") }}
+            </form>
+        </div>
+    {% else %}
+        <div class="auth-prompt">
+            <p><a href="{{ url_for('auth.login') }}">Sign in</a> to respond.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
