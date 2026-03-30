@@ -41,6 +41,8 @@ RULES:
 
 def _generate_ai_response(title, body, category_name, answers_data):
     """Generate an AI response using the Gemini API, with fallback."""
+    if os.environ.get('SKIP_GEMINI_SEED'):
+        return _fallback_response(category_name)
     api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key or not GEMINI_AVAILABLE:
         return _fallback_response(category_name)

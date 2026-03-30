@@ -122,6 +122,8 @@ def get_ai_user():
 
 
 def generate_with_gemini(question):
+    if os.environ.get('SKIP_GEMINI_SEED'):
+        return None
     api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key or not GEMINI_AVAILABLE:
         return None

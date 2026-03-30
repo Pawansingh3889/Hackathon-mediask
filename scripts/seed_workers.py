@@ -41,6 +41,8 @@ RULES:
 
 def _generate_ai_with_gemini(title, body, answers_data):
     """Generate an AI response using the Gemini API."""
+    if os.environ.get('SKIP_GEMINI_SEED'):
+        return None
     api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key or not GEMINI_AVAILABLE:
         return None
