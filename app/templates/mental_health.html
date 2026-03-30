@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Mental Health Hub{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Mental Health</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+<div class="mh-page">
+    <!-- HERO -->
+    <section class="mh-hero" data-aos="fade-up">
+        <div class="mh-hero-bg">
+            <div class="mh-hero-orb orb-1"></div>
+            <div class="mh-hero-orb orb-2"></div>
+            <div class="mh-hero-orb orb-3"></div>
+        </div>
+        <div class="mh-hero-content">
+            <div class="mh-hero-badge"><i class="fa-solid fa-brain"></i> Mental Health Hub</div>
+            <h1>Your mind matters.<br>Let's talk about it.</h1>
+            <p>A safe, supportive space to ask questions about mental health, share experiences, and find guidance from NHS-verified sources and our community.</p>
+            <div class="mh-hero-actions">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('questions.ask') }}" class="btn btn-glow btn-lg">
+                        <i class="fa-solid fa-plus"></i> Ask a Question
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-glow btn-lg">
+                        <i class="fa-solid fa-user-plus"></i> Join the Community
+                    </a>
+                {% endif %}
+                <a href="{{ url_for('workplace.index') }}" class="btn btn-glass btn-lg">
+                    <i class="fa-solid fa-building-user"></i> Workplace Support
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="mh-stats" data-aos="fade-up" data-aos-delay="100">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_questions }}</div>
+            <div class="stat-label">Mental Health Questions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_users }}</div>
+            <div class="stat-label">Community Members</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Always Available</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number"><i class="fa-solid fa-shield-check"></i></div>
+            <div class="stat-label">NHS Verified Sources</div>
+        </div>
+    </section>
+
+    <!-- CRISIS BANNER -->
+    <section class="crisis-banner" data-aos="fade-up" data-aos-delay="150">
+        <div class="crisis-icon"><i class="fa-solid fa-phone"></i></div>
+        <div class="crisis-text">
+            <strong>Need urgent help?</strong>
+            <span>Call Samaritans free on <strong>116 123</strong> (24/7) &bull; Text SHOUT to <strong>85258</strong> &bull; Emergency: <strong>999</strong></span>
+        </div>
+    </section>
+
+    <!-- QUICK TOPICS -->
+    <section class="mh-topics" data-aos="fade-up" data-aos-delay="200">
+        <h2>Common Topics</h2>
+        <div class="topic-grid">
+            <a href="{{ url_for('main.search', q='anxiety') }}" class="topic-card tc-purple">
+                <i class="fa-solid fa-cloud-bolt"></i>
+                <span>Anxiety</span>
+            </a>
+            <a href="{{ url_for('main.search', q='depression') }}" class="topic-card tc-blue">
+                <i class="fa-solid fa-cloud-rain"></i>
+                <span>Depression</span>
+            </a>
+            <a href="{{ url_for('main.search', q='stress') }}" class="topic-card tc-orange">
+                <i class="fa-solid fa-fire"></i>
+                <span>Stress</span>
+            </a>
+            <a href="{{ url_for('main.search', q='burnout') }}" class="topic-card tc-red">
+                <i class="fa-solid fa-battery-quarter"></i>
+                <span>Burnout</span>
+            </a>
+            <a href="{{ url_for('main.search', q='sleep') }}" class="topic-card tc-indigo">
+                <i class="fa-solid fa-moon"></i>
+                <span>Sleep</span>
+            </a>
+            <a href="{{ url_for('main.search', q='lonely') }}" class="topic-card tc-teal">
+                <i class="fa-solid fa-user-group"></i>
+                <span>Loneliness</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Q&A FEED -->
+    <section class="mh-feed" data-aos="fade-up">
+        <h2><i class="fa-solid fa-comments"></i> Latest Questions</h2>
+        {% for question in questions.items %}
+            <div class="question-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 40 }}">
+                <div class="question-stats">
+                    <div class="stat-pill">
+                        <i class="fa-solid fa-comment"></i> {{ question.answer_count }}
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fa-solid fa-eye"></i> {{ question.view_count }}
+                    </div>
+                </div>
+                <div class="question-content">
+                    <h3><a href="{{ url_for('questions.detail', id=question.id) }}">{{ question.title }}</a></h3>
+                    <p class="question-preview">{{ question.body[:150] }}{% if question.body|length > 150 %}...{% endif %}</p>
+                    <div class="question-meta">
+                        {% if question.is_official %}
+                            <span class="badge badge-official"><i class="fa-solid fa-check-circle"></i> {{ question.source }}</span>
+                        {% endif %}
+                        <span class="badge badge-category">{{ question.category.name }}</span>
+                        <span class="meta-text">
+                            <a href="{{ url_for('users.profile', id=question.author.id) }}">{{ question.author.full_name }}</a>
+                            &bull; {{ question.created_at.strftime('%d %b %Y') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-comment-medical fa-3x"></i>
+                <p>No mental health questions yet. Start the conversation.</p>
+            </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

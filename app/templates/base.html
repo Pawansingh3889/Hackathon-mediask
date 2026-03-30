@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MediAsk{% endblock %} — Health Q&A</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="description" content="MediAsk — Ask health questions, get answers from the community and verified NHS sources.">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('main.index') }}" class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-heartbeat"></i></div>
+                <span>Medi<strong>Ask</strong></span>
+            </a>
+
+            <form class="search-bar" action="{{ url_for('main.search') }}" method="GET">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input type="text" name="q" placeholder="Search health topics, symptoms, conditions..."
+                       value="{{ request.args.get('q', '') }}" autocomplete="off">
+            </form>
+
+            <div class="nav-links">
+                <a href="{{ url_for('main.index') }}" class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}">
+                    <i class="fa-solid fa-house"></i> <span>Home</span>
+                </a>
+                <a href="{{ url_for('main.mental_health') }}" class="nav-link nav-mental {% if request.endpoint == 'main.mental_health' %}active{% endif %}">
+                    <i class="fa-solid fa-brain"></i> <span>Mental Health</span>
+                </a>
+                <a href="{{ url_for('workplace.index') }}" class="nav-link {% if 'workplace' in request.endpoint|default('') %}active{% endif %}">
+                    <i class="fa-solid fa-building-user"></i> <span>Workplace</span>
+                </a>
+                <a href="{{ url_for('stories.index') }}" class="nav-link {% if 'stories' in request.endpoint|default('') %}active{% endif %}">
+                    <i class="fa-solid fa-book-open"></i> <span>Stories</span>
+                </a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('questions.ask') }}" class="btn btn-glow">
+                        <i class="fa-solid fa-plus"></i> Ask
+                    </a>
+                    <!-- NOTIFICATION BELL -->
+                    <a href="{{ url_for('users.notifications') }}" class="nav-link-icon notif-bell" title="Notifications">
+                        <i class="fa-solid fa-bell"></i>
+                        {% if notif_count > 0 %}<span class="notif-badge">{{ notif_count }}</span>{% endif %}
+                    </a>
+                    <div class="nav-user">
+                        <a href="{{ url_for('users.profile', id=current_user.id) }}" class="avatar-sm" title="{{ current_user.level.name }} &bull; {{ current_user.reputation_points }} pts">
+                            {{ current_user.first_name[0] }}
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="nav-link-icon" title="Sign Out">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="nav-link">Sign In</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-glow">Join Free</a>
+                {% endif %}
+            </div>
+
+            <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- BREADCRUMB / BACK NAV -->
+    {% block breadcrumb %}{% endblock %}
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="toast-container">
+                {% for category, message in messages %}
+                    <div class="toast toast-{{ category }}" data-aos="fade-left">
+                        <i class="fa-solid {% if category == 'success' %}fa-check-circle{% elif category == 'danger' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="toast-close">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- MAIN LAYOUT -->
+    <div class="app-layout">
+        {% block sidebar %}
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <h4 class="sidebar-title">Browse Topics</h4>
+                <ul class="category-list">
+                    {% for cat in categories|default([]) %}
+                        <li data-aos="fade-right" data-aos-delay="{{ loop.index * 30 }}">
+                            <a href="{{ url_for('main.category', slug=cat.slug) }}"
+                               class="{% if current_category is defined and current_category.id == cat.id %}active{% endif %}">
+                                <i class="fa-solid {{ cat.icon or 'fa-tag' }}"></i>
+                                <span>{{ cat.name }}</span>
+                                <span class="cat-count">{{ cat.questions.count() }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="sidebar-section sidebar-cta" data-aos="fade-up">
+                <div class="cta-card">
+                    <i class="fa-solid fa-shield-heart cta-icon"></i>
+                    <h4>Health Disclaimer</h4>
+                    <p>MediAsk provides general information only. Always consult a qualified healthcare professional for medical advice.</p>
+                </div>
+            </div>
+        </aside>
+        {% endblock %}
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <i class="fa-solid fa-heartbeat"></i> MediAsk
+            </div>
+            <p>Community health Q&A powered by NHS and GOV.UK data</p>
+            <div class="footer-links">
+                <a href="{{ url_for('main.index') }}">Home</a>
+                <a href="{{ url_for('main.mental_health') }}">Mental Health</a>
+                <a href="{{ url_for('workplace.index') }}">Workplace Wellbeing</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 600, once: true, offset: 50 });
+        // Auto-dismiss toasts
+        document.querySelectorAll('.toast').forEach(t => setTimeout(() => t.remove(), 5000));
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

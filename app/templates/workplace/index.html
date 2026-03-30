@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Workplace Wellbeing{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Workplace</span>
+    </div>
+    <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="home-feed">
+    <!-- WORKPLACE SUB-NAV -->
+    <div class="workplace-subnav" data-aos="fade-up">
+        <a href="{{ url_for('workplace.index') }}" class="subnav-tab active">
+            <i class="fa-solid fa-heart-pulse"></i> Wellbeing Posts
+        </a>
+        <a href="{{ url_for('main.workers_health') }}" class="subnav-tab">
+            <i class="fa-solid fa-hard-hat"></i> Factory Workers Health
+        </a>
+    </div>
+
+    <div class="feed-header" data-aos="fade-up">
+        <div>
+            <h2><i class="fa-solid fa-heart-pulse"></i> Workplace Wellbeing</h2>
+            <p class="meta-text">A safe space to share and support each other on workplace health.</p>
+        </div>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('workplace.create_post') }}" class="btn btn-glow">
+                <i class="fa-solid fa-plus"></i> Share Experience
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="topic-filters" data-aos="fade-up">
+        <a href="{{ url_for('workplace.index') }}" class="badge {% if not current_topic %}badge-active{% endif %}">All</a>
+        {% for value, label in topics %}
+            <a href="{{ url_for('workplace.index', topic=value) }}"
+               class="badge {% if current_topic == value %}badge-active{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+
+    {% for post in posts.items %}
+        <div class="question-card workplace-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
+            <div class="question-content">
+                <h3><a href="{{ url_for('workplace.view_post', id=post.id) }}">{{ post.title }}</a></h3>
+                <p class="question-preview">{{ post.body[:200] }}{% if post.body|length > 200 %}...{% endif %}</p>
+                <div class="question-meta">
+                    <span class="badge badge-topic">{{ post.topic }}</span>
+                    <span class="meta-text">
+                        by {{ post.author.full_name }}
+                        on {{ post.created_at.strftime('%d %b %Y') }}
+                        &bull; {{ post.comments.count() }} replies
+                    </span>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-heart-pulse fa-3x"></i>
+            <h3>No posts yet</h3>
+            <p>Be the first to share your workplace experience.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
