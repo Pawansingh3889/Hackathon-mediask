@@ -7,6 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+RUN chmod +x start.sh
+
 EXPOSE 5000
 
-CMD ["bash", "-c", "python -c 'from app import create_app, db; app = create_app(); app.app_context().push(); db.create_all(); print(\"DB tables created\")' && python scripts/seed_categories.py && gunicorn --bind 0.0.0.0:5000 run:app"]
+CMD ["bash", "start.sh"]

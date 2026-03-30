@@ -187,4 +187,128 @@ EXTRA_QA_DATA = [
      [('David', 'Kapoor', 'I started cold water swimming in the Humber 6 months ago. The initial shock is brutal but the feeling afterwards is incredible — like a natural high that lasts for hours. Anecdotally, it has improved my mood, energy, and I sleep much better. I go with a group which makes it social too.', None, None),
       ('Dr Sarah', 'Mitchell', 'There is emerging research showing cold water immersion can trigger the release of endorphins and dopamine, reduce inflammation, and improve circulation. Some studies show benefits for depression and anxiety. However, it carries risks — cold water shock can cause cardiac arrhythmia, and hypothermia is a real danger. Never swim alone, acclimatise gradually, and consult your GP if you have heart conditions.', None, None),
      ]),
+
+    # ===== MORE CANCER =====
+    ('cancer', 'What happens during chemotherapy and what are the side effects?',
+     'My mum has been told she needs chemotherapy for breast cancer. We are terrified. What should we expect?',
+     None,
+     [('NHS', 'Official', 'Chemotherapy uses anti-cancer drugs to destroy cancer cells. It is given in cycles — usually a treatment session followed by a rest period. Common side effects include tiredness, feeling sick, hair loss, increased risk of infections, bruising and bleeding, sore mouth, and changes in appetite. Not everyone gets all side effects, and there are medicines to help manage many of them.', 'nhs.uk', 'https://www.nhs.uk/conditions/chemotherapy/'),
+      ('Rachel', 'Hughes', 'My sister went through breast cancer chemo last year. Three practical things: 1) Stock up on ginger tea and plain crackers for nausea. 2) Get a good water bottle — staying hydrated reduces side effects significantly. 3) Ask the oncology nurse about the cold cap to help prevent hair loss. Also, Macmillan Cancer Support (0808 808 00 00) were absolutely brilliant — free practical and emotional support.', None, None),
+     ]),
+
+    ('cancer', 'How do I check for breast lumps and when should I be worried?',
+     'I am 35 and have never checked my breasts properly. How do I do it and what am I looking for?',
+     None,
+     [('NHS', 'Official', 'There is no special technique for checking your breasts. The important thing is to get to know how your breasts normally look and feel so you notice any changes. Look at and feel each breast, including the armpits and up to the collarbone. See your GP if you notice a lump or area of thickened tissue, a change in the size or shape of a breast, dimpling of the skin, a rash on or around the nipple, discharge from a nipple, or a change in the position of the nipple.', 'nhs.uk', 'https://www.nhs.uk/conditions/breast-cancer/symptoms/'),
+      ('Priya', 'Sharma', 'I found a lump at 32 and panicked. It turned out to be a fibroadenoma — completely benign. But I am so glad I went to my GP immediately. They referred me for an ultrasound within 2 weeks. The key message: most lumps are NOT cancer, but always get them checked. Do not wait and worry — the 2-week urgent referral pathway exists for exactly this situation.', None, None),
+     ]),
+
+    # ===== MORE SURGERY =====
+    ('surgery', 'What questions should I ask my surgeon before an operation?',
+     'I am scheduled for surgery next month and feel I do not know enough about what is going to happen.',
+     None,
+     [('James', 'Thornton', 'From my experience with two surgeries, these are the most useful questions: 1) What are the risks and benefits? 2) How long is the recovery? 3) When can I return to work? 4) What pain management will I have afterwards? 5) What are the alternatives to surgery? 6) How many of these procedures have you performed? 7) What should I do to prepare? Write your questions down and bring someone with you — you will be nervous and may forget things.', None, None),
+      ('Dr Sarah', 'Mitchell', 'Always ask about the specific risks for YOUR situation, not just general risks. Also ask about the anaesthetic — general, local, or spinal — and what to expect when you wake up. Request written information you can take home and review. Do not be afraid to ask for time to think about it if you are unsure. Informed consent means you truly understand what is being proposed.', None, None),
+     ]),
+
+    # ===== MORE ENT =====
+    ('ent', 'Why do I keep getting sore throats every few weeks?',
+     'I get a sore throat almost every month. Sometimes with white patches on my tonsils. My GP just gives me antibiotics each time.',
+     None,
+     [('Dr Sarah', 'Mitchell', 'Recurrent tonsillitis — more than 7 episodes in a year, or 5 per year for 2 years, or 3 per year for 3 years — is a guideline for referral to ENT to discuss tonsillectomy. If you are getting this frequently, repeated antibiotics alone are not the answer. Ask your GP for an ENT referral. In the meantime, gargling with warm salt water, staying hydrated, and taking paracetamol can help manage symptoms.', None, None),
+     ]),
+
+    ('ent', 'I have had a blocked nose for months. Could it be more than a cold?',
+     'My nose has been blocked on one side for about 3 months. I have tried decongestants but nothing works.',
+     None,
+     [('NHS', 'Official', 'A persistently blocked nose can be caused by several conditions: nasal polyps (non-cancerous growths), a deviated septum, chronic sinusitis, or allergies. If it has lasted more than 3 months and is not responding to treatment, your GP should consider an ENT referral. A one-sided blockage that does not improve should always be investigated.', 'nhs.uk', 'https://www.nhs.uk/conditions/nasal-polyps/'),
+      ('David', 'Kapoor', 'I had this exact issue — turned out to be nasal polyps. My GP referred me to ENT, they did a nasal endoscopy (not painful, just uncomfortable for 10 seconds), and I started on a steroid nasal spray. Cleared up within 6 weeks. Push for a referral if your GP just keeps suggesting decongestants.', None, None),
+     ]),
+
+    # ===== MORE CONGENITAL =====
+    ('congenital', 'What genetic tests are available during pregnancy?',
+     'I am 12 weeks pregnant and have been offered screening tests. What do they test for and are they safe?',
+     None,
+     [('NHS', 'Official', 'The NHS offers screening tests during pregnancy to check for certain conditions in the baby. The combined test (at 10-14 weeks) checks for Down syndrome, Edwards syndrome, and Patau syndrome using a blood test and ultrasound. If the screening suggests a higher chance, you will be offered diagnostic tests such as amniocentesis or chorionic villus sampling (CVS). These carry a small risk of miscarriage (less than 1%).', 'nhs.uk', 'https://www.nhs.uk/pregnancy/your-pregnancy-care/screening-tests/'),
+      ('Emily', 'Chen', 'I had the combined screening at 12 weeks. The blood test and scan together are completely safe — there is no risk. It was only if I needed the follow-up amniocentesis that there would be a small risk. The screening is optional, and the results give you a probability, not a definitive answer. Take time to discuss with your partner and midwife what you would want to do with the information before deciding.', None, None),
+     ]),
+
+    # ===== MORE BLOOD DISORDERS =====
+    ('blood-disorders', 'What is sickle cell disease and who is at risk?',
+     'My friend was recently diagnosed with sickle cell trait. What does this mean and could my children be at risk?',
+     None,
+     [('NHS', 'Official', 'Sickle cell disease is an inherited blood disorder that affects the shape of red blood cells. It mainly affects people of African, Caribbean, Middle Eastern, Eastern Mediterranean, and Asian descent. Sickle cell trait means carrying one copy of the gene — this usually does not cause symptoms but can be passed to children. If both parents have the trait, there is a 1 in 4 chance their child will have sickle cell disease.', 'nhs.uk', 'https://www.nhs.uk/conditions/sickle-cell-disease/'),
+      ('Dr Sarah', 'Mitchell', 'If you are planning a family and your partner has sickle cell trait, ask your GP for a haemoglobinopathy screen. This is a simple blood test that checks whether you also carry the trait. The NHS Sickle Cell and Thalassaemia Screening Programme offers testing to all pregnant women in England. Early knowledge allows you to make informed decisions and access genetic counselling.', None, None),
+     ]),
+
+    # ===== MORE IMMUNE SYSTEM =====
+    ('immune-system', 'What are autoimmune diseases and why is my body attacking itself?',
+     'I have been diagnosed with rheumatoid arthritis at 30. My doctor says it is autoimmune. What does this mean?',
+     None,
+     [('Dr Sarah', 'Mitchell', 'Autoimmune diseases occur when your immune system mistakenly attacks healthy cells in your body. In rheumatoid arthritis, it attacks the lining of your joints, causing inflammation, pain, and swelling. There are over 80 autoimmune conditions. The cause is not fully understood, but genetic factors, environmental triggers, and hormonal factors play a role. Treatment focuses on reducing inflammation and managing symptoms with disease-modifying drugs (DMARDs).', None, None),
+      ('NHS', 'Official', 'Rheumatoid arthritis is a long-term condition that causes pain, swelling, and stiffness in the joints. It usually affects the hands, feet, and wrists. Treatment includes disease-modifying anti-rheumatic drugs (DMARDs) to slow the condition and reduce the risk of joint damage. The earlier treatment is started, the more effective it is likely to be.', 'nhs.uk', 'https://www.nhs.uk/conditions/rheumatoid-arthritis/'),
+     ]),
+
+    # ===== MORE METABOLIC =====
+    ('metabolic', 'What are the symptoms of an underactive thyroid?',
+     'I have been gaining weight, feeling exhausted, and my hair is thinning. My mum has thyroid problems. Could I have it too?',
+     None,
+     [('NHS', 'Official', 'An underactive thyroid (hypothyroidism) is where your thyroid gland does not produce enough hormones. Common symptoms include tiredness, weight gain, feeling cold, dry skin, thinning hair, muscle aches, depression, and a slow heart rate. It is more common in women and runs in families. Diagnosis is made with a simple blood test measuring TSH and T4 levels. Treatment is daily levothyroxine tablets, which you will need for life.', 'nhs.uk', 'https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/'),
+      ('Rachel', 'Hughes', 'I had exactly these symptoms and it took 2 years to get diagnosed because I kept being told it was stress. Push your GP for a full thyroid panel blood test — not just TSH, but also free T4 and thyroid antibodies. Once I started levothyroxine, it took about 6-8 weeks to feel a difference, but now I feel completely normal. The weight came off gradually too.', None, None),
+     ]),
+
+    # ===== MORE EYE =====
+    ('eye-vision', 'What is glaucoma and how would I know if I have it?',
+     'My optician mentioned checking for glaucoma at my last eye test. I am 42. What is it?',
+     None,
+     [('NHS', 'Official', 'Glaucoma is a group of eye conditions where the optic nerve is damaged, often by high pressure in the eye. It usually develops slowly and can affect your peripheral (side) vision first. Without treatment, it can lead to blindness. It is more common over 40, in people of African or Caribbean descent, and in those with a family history. Regular eye tests are the best way to detect it early.', 'nhs.uk', 'https://www.nhs.uk/conditions/glaucoma/'),
+      ('James', 'Thornton', 'My dad lost peripheral vision in one eye before glaucoma was caught. He had no pain, no symptoms — just gradually lost side vision without realising. Now he uses eye drops daily and his vision is stable. The key takeaway: get your eyes tested every 2 years (free on the NHS if over 40 with a family history). If caught early, eye drops can prevent damage.', None, None),
+     ]),
+
+    # ===== MORE WORKERS HEALTH IN GENERAL CATEGORIES =====
+    ('general', 'How do I eat healthy on a tight budget?',
+     'I am a factory worker earning minimum wage. Fresh food seems so expensive. How can I eat healthily without spending a fortune?',
+     None,
+     [('Emily', 'Chen', 'I feed my family of 4 healthily on about 40 pounds a week. My tips: 1) Frozen veg is just as nutritious as fresh and costs a fraction. 2) Tinned beans, lentils, and chickpeas are cheap protein powerhouses. 3) Buy a whole chicken and use it for 3 meals. 4) Porridge oats are the cheapest, most nutritious breakfast. 5) Plan meals for the week before shopping and stick to a list. 6) Aldi and Lidl are genuinely cheaper without sacrificing quality. 7) Cook in batches and freeze portions.', None, None),
+      ('NHS', 'Official', 'Eating well does not have to be expensive. The Eatwell Guide recommends basing meals on potatoes, bread, rice, pasta, or other starchy carbohydrates, eating at least 5 portions of fruit and veg a day (fresh, frozen, tinned, or dried all count), and choosing beans, pulses, fish, eggs, and lean meat for protein. Frozen and tinned options are often cheaper and just as nutritious.', 'nhs.uk', 'https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/the-eatwell-guide/'),
+     ]),
+
+    ('general', 'I work 12-hour shifts and have no energy to cook. What are quick healthy meals?',
+     'After a 12-hour factory shift I am too tired to cook. I end up eating takeaways or microwave meals most nights.',
+     None,
+     [('Ahmed', 'Malik', 'I work 12-hour shifts too and meal prepping on my day off changed everything. I spend 2 hours on Sunday making: 1) A big pot of chicken curry (portions for 4 dinners). 2) Overnight oats in jars for breakfasts. 3) Wraps with pre-cooked chicken, salad, and hummus for lunches. Everything goes in the fridge or freezer. When I get home, it is 5 minutes to microwave a proper meal instead of waiting 30 minutes for a takeaway.', None, None),
+      ('David', 'Kapoor', 'Quick meals that take under 10 minutes: scrambled eggs on toast with spinach, beans on toast with cheese, tuna pasta with sweetcorn, a jacket potato (microwave 8 minutes) with beans. None of these cost more than 2 pounds and they are all genuinely nutritious. Save the elaborate cooking for your days off.', None, None),
+     ]),
+
+    # ===== MORE CARDIOVASCULAR =====
+    ('cardiovascular', 'What lifestyle changes can lower my blood pressure without medication?',
+     'My GP says my blood pressure is 150/95 and wants to put me on tablets. Can I try lifestyle changes first?',
+     None,
+     [('Dr Sarah', 'Mitchell', 'At 150/95, lifestyle changes can make a real difference. The biggest impact comes from: 1) Reducing salt to under 6g per day — check labels, processed foods are the main culprit. 2) Losing weight if overweight — even 5kg can drop your reading by 5-10 points. 3) Exercise — 30 minutes of brisk walking 5 times a week. 4) Limiting alcohol. 5) Reducing caffeine. Most GPs will give you 3-6 months to try this before starting medication. Monitor at home to track progress.', None, None),
+      ('NHS', 'Official', 'High blood pressure can often be prevented or reduced by eating healthily, maintaining a healthy weight, exercising regularly, drinking less alcohol, and stopping smoking. Cutting down on salt is one of the most effective changes. The NHS recommends eating no more than 6g of salt a day. If lifestyle changes alone are not enough, your doctor may recommend medication.', 'nhs.uk', 'https://www.nhs.uk/conditions/high-blood-pressure-hypertension/prevention/'),
+     ]),
+
+    # ===== MORE INFECTIONS =====
+    ('infections', 'How do I know if a wound is infected?',
+     'I cut my hand on a machine at work 3 days ago. It is now red, swollen, and warm to touch. Should I be worried?',
+     None,
+     [('NHS', 'Official', 'Signs that a wound may be infected include increasing redness, swelling, or pain around the wound, the area feeling warm, pus or discharge coming from the wound, a high temperature, and red streaks spreading from the wound. If you notice any of these signs, see your GP urgently or go to a minor injuries unit. Infected wounds can become serious if not treated with antibiotics.', 'nhs.uk', 'https://www.nhs.uk/conditions/infected-wounds/'),
+      ('Dr Sarah', 'Mitchell', 'Based on your description — redness, swelling, and warmth at 3 days — this wound may be infected and you should see a GP or walk-in centre today, not tomorrow. Red streaks spreading up your arm or a high temperature mean go to A&E immediately. Also make sure this was recorded in your workplace accident book and check when your last tetanus vaccination was.', None, None),
+     ]),
+
+    # ===== MORE SKIN =====
+    ('skin', 'Why do I keep getting boils and how can I prevent them?',
+     'I get painful boils on my inner thighs and armpits regularly. It is embarrassing and very painful.',
+     None,
+     [('NHS', 'Official', 'A boil is a painful, pus-filled bump under the skin caused by infected hair follicles. They are most common in areas where you sweat, have friction, or shave. To help prevent boils: wash the area gently with antibacterial soap, keep the area clean and dry, avoid squeezing or bursting boils, use a fresh towel each time, and wash bedding and clothes regularly. See your GP if boils keep coming back — they may test for diabetes or refer you to a dermatologist.', 'nhs.uk', 'https://www.nhs.uk/conditions/boils/'),
+      ('Priya', 'Sharma', 'I suffered with recurrent boils for a year before my GP diagnosed hidradenitis suppurativa (HS). It is an under-diagnosed condition, especially in areas like armpits, groin, and under the breasts. If boils keep returning in the same areas, ask your GP specifically about HS. It is not just boils — it is a chronic inflammatory skin condition that needs proper treatment.', None, None),
+     ]),
+
+    # ===== MORE EMOTIONS =====
+    ('emotions', 'How do I cope with grief after losing someone close?',
+     'I lost my dad 3 months ago and I cannot stop crying. Some days I cannot get out of bed. People say I should be over it by now.',
+     None,
+     [('Emily', 'Chen', 'Three months is nothing in grief terms. There is no timeline for grief and anyone who says otherwise has either never lost someone close or has forgotten what it felt like. Let yourself feel whatever you feel — anger, sadness, numbness, guilt — it is all normal. Be gentle with yourself. Eat even when you do not want to. Get outside even if just for 5 minutes.', None, None),
+      ('NHS', 'Official', 'Grief is a natural response to loss. There is no right or wrong way to grieve, and no set timeline. It is common to feel shock, sadness, guilt, anger, anxiety, and physical symptoms like tiredness, poor appetite, and difficulty sleeping. If grief is significantly affecting your daily life after several months, speaking to your GP can help. They can refer you to bereavement counselling. Cruse Bereavement Support (0808 808 1677) offers free support.', 'nhs.uk', 'https://www.nhs.uk/mental-health/feelings-symptoms-behaviours/feelings-and-symptoms/grief-bereavement-loss/'),
+     ]),
 ]

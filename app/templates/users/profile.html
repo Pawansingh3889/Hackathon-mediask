@@ -22,7 +22,32 @@
             <h1>{{ user.full_name }}</h1>
             {% if user.bio %}<p class="meta-text">{{ user.bio }}</p>{% endif %}
             <p class="meta-text">Member since {{ user.created_at.strftime('%B %Y') }}</p>
+            {% if user.is_admin %}
+                <span class="badge badge-nhs" style="margin-top:0.5rem;"><i class="fa-solid fa-shield"></i> Admin</span>
+            {% endif %}
         </div>
+        {% if current_user.is_authenticated and current_user.is_admin and user.id != current_user.id and not user.is_system_account %}
+        <div style="display:flex;gap:0.5rem;margin-left:auto;">
+            <form method="POST" action="{{ url_for('main.toggle_admin', id=user.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% if user.is_admin %}
+                    <button type="submit" style="background:#f59e0b;color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.85rem;" onclick="return confirm('Remove admin from {{ user.full_name }}?')">
+                        <i class="fa-solid fa-shield-xmark"></i> Demote
+                    </button>
+                {% else %}
+                    <button type="submit" style="background:#3b82f6;color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.85rem;" onclick="return confirm('Make {{ user.full_name }} an admin?')">
+                        <i class="fa-solid fa-shield"></i> Promote to Admin
+                    </button>
+                {% endif %}
+            </form>
+            <form method="POST" action="{{ url_for('main.delete_user', id=user.id) }}" onsubmit="return confirm('Delete {{ user.full_name }} and ALL their content? This cannot be undone.');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" style="background:#dc2626;color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.85rem;">
+                    <i class="fa-solid fa-user-xmark"></i> Delete User
+                </button>
+            </form>
+        </div>
+        {% endif %}
     </div>
 
     <!-- REPUTATION CARD -->

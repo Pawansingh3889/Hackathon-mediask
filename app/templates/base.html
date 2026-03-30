@@ -42,6 +42,11 @@
                     <a href="{{ url_for('questions.ask') }}" class="btn btn-glow">
                         <i class="fa-solid fa-plus"></i> Ask
                     </a>
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('main.admin_dashboard') }}" class="nav-link-icon" title="Admin Dashboard" style="color:#f59e0b;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </a>
+                    {% endif %}
                     <!-- NOTIFICATION BELL -->
                     <a href="{{ url_for('users.notifications') }}" class="nav-link-icon notif-bell" title="Notifications">
                         <i class="fa-solid fa-bell"></i>

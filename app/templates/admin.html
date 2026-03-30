@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Admin Dashboard</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="home-feed">
+    <div class="feed-header" data-aos="fade-up">
+        <h2><i class="fa-solid fa-shield-halved"></i> Admin Dashboard</h2>
+    </div>
+
+    <!-- STATS -->
+    <div class="mh-stats" data-aos="fade-up" data-aos-delay="50" style="margin-bottom:1.5rem;">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_questions }}</div>
+            <div class="stat-label">Questions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_answers }}</div>
+            <div class="stat-label">Answers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_users }}</div>
+            <div class="stat-label">Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.ai_answers }}</div>
+            <div class="stat-label">AI Answers</div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="sort-tabs" data-aos="fade-up" style="margin-bottom:1rem;">
+        <a href="#questions-section" class="sort-tab active" onclick="showTab('questions')">
+            <i class="fa-solid fa-comment-medical"></i> Questions
+        </a>
+        <a href="#users-section" class="sort-tab" onclick="showTab('users')">
+            <i class="fa-solid fa-users"></i> Users
+        </a>
+    </div>
+
+    <!-- QUESTIONS MANAGEMENT -->
+    <div id="questions-section" data-aos="fade-up">
+        <h3 style="margin-bottom:1rem;color:var(--text-secondary);"><i class="fa-solid fa-list"></i> All Questions ({{ stats.total_questions }})</h3>
+        {% for q in questions.items %}
+        <div class="question-card" style="align-items:center;">
+            <div class="question-stats">
+                <div class="stat-pill {% if q.answer_count > 0 %}has-answers{% endif %}">
+                    <i class="fa-solid fa-comment"></i> {{ q.answer_count }}
+                </div>
+                <div class="stat-pill">
+                    <i class="fa-solid fa-eye"></i> {{ q.view_count }}
+                </div>
+            </div>
+            <div class="question-content" style="flex:1;">
+                <h3 style="font-size:0.95rem;"><a href="{{ url_for('questions.detail', id=q.id) }}">{{ q.title }}</a></h3>
+                <div class="question-meta">
+                    <span class="badge badge-category">{{ q.category.name }}</span>
+                    <span class="meta-text">
+                        {{ q.author.full_name }} &bull; {{ q.created_at.strftime('%d %b %Y') }}
+                    </span>
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('questions.delete', id=q.id) }}" style="margin-left:0.5rem;" onsubmit="return confirm('Delete this question and all answers?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" style="background:#dc2626;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;white-space:nowrap;">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+
+        {% if questions.has_next or questions.has_prev %}
+        <div class="pagination" style="margin-top:1rem;">
+            {% if questions.has_prev %}<a href="?page_q={{ questions.prev_num }}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Prev</a>{% endif %}
+            <span class="page-info">Page {{ questions.page }} / {{ questions.pages }}</span>
+            {% if questions.has_next %}<a href="?page_q={{ questions.next_num }}" class="btn btn-outline">Next <i class="fa-solid fa-arrow-right"></i></a>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- USERS MANAGEMENT -->
+    <div id="users-section" style="display:none;" data-aos="fade-up">
+        <h3 style="margin-bottom:1rem;color:var(--text-secondary);"><i class="fa-solid fa-users-gear"></i> All Users ({{ stats.total_users }})</h3>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            {% for user in users.items %}
+            <div class="question-card" style="align-items:center;padding:1rem;">
+                <div class="avatar-sm {% if user.is_admin %}avatar-nhs{% endif %}" style="flex-shrink:0;">
+                    {{ user.first_name[0] }}
+                </div>
+                <div style="flex:1;margin-left:1rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                        <a href="{{ url_for('users.profile', id=user.id) }}" style="font-weight:600;color:var(--text-primary);">
+                            {{ user.full_name }}
+                        </a>
+                        {% if user.is_admin %}
+                            <span class="badge badge-nhs" style="font-size:0.7rem;"><i class="fa-solid fa-shield"></i> Admin</span>
+                        {% endif %}
+                    </div>
+                    <div class="meta-text">{{ user.email }} &bull; Joined {{ user.created_at.strftime('%d %b %Y') }} &bull; {{ user.reputation_points }} pts &bull; {{ user.questions.count() }} questions &bull; {{ user.answers.count() }} answers</div>
+                </div>
+                <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+                    <form method="POST" action="{{ url_for('main.toggle_admin', id=user.id) }}" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% if user.is_admin %}
+                            <button type="submit" style="background:#f59e0b;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;white-space:nowrap;" onclick="return confirm('Remove admin from {{ user.full_name }}?')">
+                                <i class="fa-solid fa-shield-xmark"></i> Demote
+                            </button>
+                        {% else %}
+                            <button type="submit" style="background:#3b82f6;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;white-space:nowrap;" onclick="return confirm('Make {{ user.full_name }} an admin?')">
+                                <i class="fa-solid fa-shield"></i> Promote
+                            </button>
+                        {% endif %}
+                    </form>
+                    <form method="POST" action="{{ url_for('main.delete_user', id=user.id) }}" style="display:inline;" onsubmit="return confirm('Delete user {{ user.full_name }} and ALL their content? This cannot be undone.');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" style="background:#dc2626;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;white-space:nowrap;">
+                            <i class="fa-solid fa-user-xmark"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if users.has_next or users.has_prev %}
+        <div class="pagination" style="margin-top:1rem;">
+            {% if users.has_prev %}<a href="?page_u={{ users.prev_num }}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Prev</a>{% endif %}
+            <span class="page-info">Page {{ users.page }} / {{ users.pages }}</span>
+            {% if users.has_next %}<a href="?page_u={{ users.next_num }}" class="btn btn-outline">Next <i class="fa-solid fa-arrow-right"></i></a>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showTab(tab) {
+    document.getElementById('questions-section').style.display = tab === 'questions' ? 'block' : 'none';
+    document.getElementById('users-section').style.display = tab === 'users' ? 'block' : 'none';
+    document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('active'));
+    event.target.closest('.sort-tab').classList.add('active');
+}
+</script>
+{% endblock %}

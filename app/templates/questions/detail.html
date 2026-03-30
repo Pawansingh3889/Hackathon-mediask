@@ -29,6 +29,12 @@
                 <span class="meta-text">
                     Asked by
                     <a href="{{ url_for('users.profile', id=question.author.id) }}">{{ question.author.full_name }}</a>
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                    <form method="POST" action="{{ url_for('questions.delete', id=question.id) }}" style="display:inline;" onsubmit="return confirm('Delete this question and all its answers?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" style="background:red;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;margin-left:10px;">Delete</button>
+                    </form>
+                    {% endif %}
                     &bull; {{ question.created_at.strftime('%d %b %Y') }}
                     &bull; <i class="fa-solid fa-eye"></i> {{ question.view_count }} views
                 </span>
@@ -84,6 +90,12 @@
                             <a href="{{ answer.source_url }}" target="_blank" rel="noopener" class="source-link">
                                 <i class="fa-solid fa-external-link"></i> Source
                             </a>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.is_admin %}
+                            <form method="POST" action="{{ url_for('questions.delete_answer', id=answer.id) }}" style="display:inline;" onsubmit="return confirm('Delete this answer?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" style="background:#dc2626;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.8rem;"><i class="fa-solid fa-trash"></i> Delete</button>
+                            </form>
                         {% endif %}
                     </div>
                 </div>

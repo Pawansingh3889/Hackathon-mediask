@@ -7,7 +7,82 @@ from app import create_app, db
 from app.models import User, Question, Answer, Category, Vote
 from datetime import datetime, timezone, timedelta
 import random
+import time
 from scripts.extra_qa_data import EXTRA_QA_DATA
+
+try:
+    from google import genai
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
+
+
+GEMINI_SYSTEM_PROMPT = """You are MediAsk AI, a friendly and practical health assistant for a UK-based health Q&A platform.
+
+YOUR STYLE:
+- Talk like a knowledgeable friend, not a medical textbook
+- Give PRACTICAL, actionable advice FIRST
+- Use simple everyday language
+- Be warm, reassuring and direct
+
+RESPONSE STRUCTURE:
+1. Brief empathetic acknowledgement
+2. PRACTICAL STEPS — numbered list of what to do right now
+3. Warning signs that need professional help
+4. When to see a GP or contact NHS 111
+5. One-line disclaimer: "Please note: this is general health information, not a substitute for professional medical advice."
+
+RULES:
+- UK terminology: GP not PCP, A&E not ER, paracetamol not acetaminophen
+- Keep it 100-200 words
+- Do NOT start with 'Based on NHS guidance'
+- Practical advice FIRST, NHS referral SECOND"""
+
+
+def _generate_ai_response(title, body, category_name, answers_data):
+    """Generate an AI response using the Gemini API, with fallback."""
+    api_key = os.environ.get('GEMINI_API_KEY')
+    if not api_key or not GEMINI_AVAILABLE:
+        return _fallback_response(category_name)
+    try:
+        client = genai.Client(api_key=api_key)
+        context_parts = []
+        for a_first, a_last, a_body, a_source, a_url in answers_data[:3]:
+            source_label = f' ({a_source})' if a_source else ''
+            context_parts.append(f'{a_first} {a_last}{source_label}: {a_body[:300]}')
+        context = '\n\n'.join(context_parts)
+
+        prompt = (
+            f"{GEMINI_SYSTEM_PROMPT}\n\n"
+            f"CATEGORY: {category_name}\n"
+            f"QUESTION: {title}\n"
+            f"DETAILS: {body}\n\n"
+            f"OTHER ANSWERS ALREADY PROVIDED:\n{context}\n\n"
+            f"Provide a helpful AI summary that adds value. Focus on practical next steps:"
+        )
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+        text = response.text
+        if 'not a substitute' not in text:
+            text += '\n\nPlease note: this is general health information, not a substitute for professional medical advice.'
+        print(f'    [Gemini] AI response for: {title[:50]}...')
+        time.sleep(1)
+        return text
+    except Exception as e:
+        print(f'    Gemini error: {e}')
+        return _fallback_response(category_name)
+
+
+def _fallback_response(category_name):
+    """Simple fallback when Gemini is unavailable."""
+    return (
+        f'This is an important {category_name.lower()} question. We recommend speaking with your GP '
+        f'for personalised advice. You can also contact NHS 111 (free, 24/7) for urgent guidance, '
+        f'or visit nhs.uk for trusted health information.\n\n'
+        f'Please note: this is general health information, not a substitute for professional medical advice.'
+    )
 
 # System users who "posted" the content
 SYSTEM_USERS = [
@@ -21,6 +96,7 @@ SYSTEM_USERS = [
     ('David', 'Kapoor', 'david.k@mediask.org', False, None),
     ('Rachel', 'Hughes', 'rachel.h@mediask.org', False, None),
     ('Ahmed', 'Malik', 'ahmed.m@mediask.org', False, None),
+    ('MediAsk', 'AI', 'ai@mediask.org', True, None),
 ]
 
 # (category_slug, title, body, source, answers_list)
@@ -290,10 +366,19 @@ def seed():
                 a_user = users.get(a_name, list(users.values())[3])
                 a_time = q_time + timedelta(hours=random.randint(1, 48))
 
+                # Determine auth level
+                if a_source and 'nhs' in a_source:
+                    auth_level = 'nhs_verified'
+                elif a_source and 'gov' in a_source:
+                    auth_level = 'govuk'
+                else:
+                    auth_level = 'human_experience'
+
                 answer = Answer(
                     body=a_body,
                     question_id=question.id,
                     author_id=a_user.id,
+                    auth_level=auth_level,
                     source=a_source,
                     source_url=a_url,
                     created_at=a_time
@@ -311,6 +396,24 @@ def seed():
                         value=random.choice([1, 1, 1, 1, -1])  # mostly upvotes
                     )
                     db.session.add(vote)
+
+            # Auto-generate AI response for each question
+            ai_user = users.get('MediAsk AI')
+            if ai_user:
+                cat_name = cat.name if cat else 'General Health'
+                ai_body = _generate_ai_response(title, body, cat_name, answers_data)
+                ai_answer = Answer(
+                    body=ai_body,
+                    question_id=question.id,
+                    author_id=ai_user.id,
+                    source='MediAsk AI',
+                    source_url=None,
+                    auth_level='ai_assistant',
+                    created_at=q_time + timedelta(hours=random.randint(1, 24))
+                )
+                db.session.add(ai_answer)
+                db.session.flush()
+                a_count += 1
 
         db.session.commit()
         print(f'Questions: {q_count} created')

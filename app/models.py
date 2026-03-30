@@ -46,6 +46,7 @@ class User(UserMixin, db.Model):
     avatar_url = db.Column(db.String(500), nullable=True)
     bio = db.Column(db.Text, nullable=True)
     is_system_account = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)
     onboarded = db.Column(db.Boolean, default=False)
     created_at = db.Column(
         db.DateTime, default=lambda: datetime.now(timezone.utc)

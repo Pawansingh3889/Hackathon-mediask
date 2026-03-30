@@ -1,7 +1,8 @@
 from flask import render_template, request, redirect, url_for, flash
+from flask_login import login_required, current_user
 from app.main import bp
 from app import db
-from app.models import Question, Answer, Category, User, HazardReport
+from app.models import Question, Answer, Category, User, Vote, HazardReport
 from sqlalchemy import func
 import random
 
@@ -194,3 +195,87 @@ def submit_hazard():
 
     # Redirect them back to the workers health page
     return redirect(url_for('main.workers_health'))
+
+
+# ===== ADMIN DASHBOARD =====
+@bp.route('/admin')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash('Access denied. Admin only.', 'danger')
+        return redirect(url_for('main.index'))
+
+    page_q = request.args.get('page_q', 1, type=int)
+    page_u = request.args.get('page_u', 1, type=int)
+
+    stats = {
+        'total_questions': Question.query.count(),
+        'total_answers': Answer.query.count(),
+        'total_users': User.query.filter_by(is_system_account=False).count(),
+        'total_categories': Category.query.count(),
+        'ai_answers': Answer.query.filter_by(auth_level='ai_assistant').count(),
+    }
+
+    questions = Question.query.order_by(
+        Question.created_at.desc()
+    ).paginate(page=page_q, per_page=15, error_out=False)
+
+    users = User.query.filter_by(
+        is_system_account=False
+    ).order_by(User.created_at.desc()).paginate(page=page_u, per_page=15, error_out=False)
+
+    categories = Category.query.order_by(Category.name).all()
+
+    return render_template(
+        'admin.html',
+        stats=stats,
+        questions=questions,
+        users=users,
+        categories=categories
+    )
+
+
+@bp.route('/admin/user/<int:id>/toggle-admin', methods=['POST'])
+@login_required
+def toggle_admin(id):
+    if not current_user.is_admin:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.index'))
+    user = User.query.get_or_404(id)
+    if user.id == current_user.id:
+        flash('You cannot change your own admin status.', 'danger')
+        return redirect(url_for('main.admin_dashboard'))
+    user.is_admin = not user.is_admin
+    db.session.commit()
+    status = 'promoted to admin' if user.is_admin else 'removed from admin'
+    flash(f'{user.full_name} has been {status}.', 'success')
+    return redirect(request.referrer or url_for('main.admin_dashboard'))
+
+
+@bp.route('/admin/user/<int:id>/delete', methods=['POST'])
+@login_required
+def delete_user(id):
+    if not current_user.is_admin:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.index'))
+    user = User.query.get_or_404(id)
+    if user.id == current_user.id:
+        flash('You cannot delete yourself.', 'danger')
+        return redirect(url_for('main.admin_dashboard'))
+    if user.is_system_account:
+        flash('Cannot delete system accounts.', 'danger')
+        return redirect(url_for('main.admin_dashboard'))
+    # Delete user's votes, answers, questions
+    for answer in user.answers:
+        Vote.query.filter_by(answer_id=answer.id).delete()
+    Answer.query.filter_by(author_id=user.id).delete()
+    for question in user.questions:
+        for ans in question.answers:
+            Vote.query.filter_by(answer_id=ans.id).delete()
+            db.session.delete(ans)
+        db.session.delete(question)
+    Vote.query.filter_by(user_id=user.id).delete()
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'User {user.full_name} has been deleted.', 'success')
+    return redirect(url_for('main.admin_dashboard'))

@@ -123,3 +123,34 @@ def vote():
 
     db.session.commit()
     return jsonify({'score': answer.score})
+
+
+@bp.route('/<int:id>/delete', methods=['POST'])
+@login_required
+def delete(id):
+    question = Question.query.get_or_404(id)
+    if question.author_id != current_user.id and not current_user.is_admin:
+        flash('Only admins or the question author can delete questions.', 'danger')
+        return redirect(url_for('questions.detail', id=id))
+    for answer in question.answers:
+        Vote.query.filter_by(answer_id=answer.id).delete()
+        db.session.delete(answer)
+    db.session.delete(question)
+    db.session.commit()
+    flash('Question deleted.', 'success')
+    return redirect(url_for('main.index'))
+
+
+@bp.route('/answer/<int:id>/delete', methods=['POST'])
+@login_required
+def delete_answer(id):
+    answer = Answer.query.get_or_404(id)
+    question_id = answer.question_id
+    if answer.author_id != current_user.id and not current_user.is_admin:
+        flash('Only admins or the answer author can delete answers.', 'danger')
+        return redirect(url_for('questions.detail', id=question_id))
+    Vote.query.filter_by(answer_id=answer.id).delete()
+    db.session.delete(answer)
+    db.session.commit()
+    flash('Answer deleted.', 'success')
+    return redirect(url_for('questions.detail', id=question_id))
