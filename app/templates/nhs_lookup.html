@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}NHS Health Lookup{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="{{ url_for('main.index') }}"><i class="fa-solid fa-home"></i> Home</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>NHS Health Lookup</span>
+    </div>
+    <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="home-feed">
+    <div class="feed-header" data-aos="fade-up">
+        <div>
+            <h2><i class="fa-solid fa-stethoscope" style="color:#005eb8;"></i> NHS Health Lookup</h2>
+            <p class="meta-text">Search for health conditions using live NHS data</p>
+        </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div data-aos="fade-up" style="margin-bottom:1.5rem;">
+        <form method="GET" action="{{ url_for('main.nhs_lookup') }}" class="search-bar" style="max-width:100%;margin:0;">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="text" name="q" placeholder="Search conditions e.g. diabetes, asthma, anxiety..."
+                   value="{{ query }}" autocomplete="off" style="width:100%;">
+            <button type="button" class="voice-btn" onclick="startVoice('nhs-search')" title="Voice search">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+        </form>
+    </div>
+
+    {% if error %}
+    <div class="daily-prompt" data-aos="fade-up" style="background:#fef3c7;border-color:#fbbf24;">
+        <div class="prompt-icon" style="color:#d97706;"><i class="fa-solid fa-info-circle"></i></div>
+        <div class="prompt-content"><p style="color:#92400e;">{{ error }}</p></div>
+    </div>
+    {% endif %}
+
+    <!-- RESULTS -->
+    {% if results %}
+    <div data-aos="fade-up">
+        <h3 style="margin-bottom:1rem;color:var(--text-secondary);">
+            <i class="fa-solid fa-list"></i> {{ results|length }} result{{ 's' if results|length != 1 }} for "{{ query }}"
+        </h3>
+        {% for r in results %}
+        <div class="question-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 30 }}">
+            <div class="question-stats">
+                <div class="stat-pill has-answers">
+                    <i class="fa-solid fa-stethoscope"></i>
+                </div>
+            </div>
+            <div class="question-content">
+                <h3><a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.name }}</a></h3>
+                <p class="question-preview">{{ r.description[:200] }}{% if r.description|length > 200 %}...{% endif %}</p>
+                <div class="question-meta">
+                    <span class="badge badge-nhs"><i class="fa-solid fa-shield-check"></i> NHS</span>
+                </div>
+            </div>
+            <div class="question-arrow"><i class="fa-solid fa-external-link"></i></div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif query %}
+    <div class="empty-state" data-aos="fade-up">
+        <i class="fa-solid fa-search fa-3x"></i>
+        <h3>No results found</h3>
+        <p>Try a different search term or <a href="{{ url_for('questions.ask') }}">ask the community</a>.</p>
+    </div>
+    {% else %}
+    <!-- POPULAR CONDITIONS -->
+    <div data-aos="fade-up">
+        <h3 style="margin-bottom:1rem;color:var(--text-secondary);"><i class="fa-solid fa-fire"></i> Popular Conditions</h3>
+        <div class="topic-grid">
+            <a href="{{ url_for('main.nhs_lookup', q='diabetes') }}" class="topic-card" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);">
+                <i class="fa-solid fa-syringe"></i><span>Diabetes</span>
+            </a>
+            <a href="{{ url_for('main.nhs_lookup', q='anxiety') }}" class="topic-card" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">
+                <i class="fa-solid fa-brain"></i><span>Anxiety</span>
+            </a>
+            <a href="{{ url_for('main.nhs_lookup', q='asthma') }}" class="topic-card" style="background:linear-gradient(135deg,#0d9488,#5eead4);">
+                <i class="fa-solid fa-lungs"></i><span>Asthma</span>
+            </a>
+            <a href="{{ url_for('main.nhs_lookup', q='back pain') }}" class="topic-card" style="background:linear-gradient(135deg,#dc2626,#f87171);">
+                <i class="fa-solid fa-person"></i><span>Back Pain</span>
+            </a>
+            <a href="{{ url_for('main.nhs_lookup', q='depression') }}" class="topic-card" style="background:linear-gradient(135deg,#4338ca,#818cf8);">
+                <i class="fa-solid fa-cloud-rain"></i><span>Depression</span>
+            </a>
+            <a href="{{ url_for('main.nhs_lookup', q='high blood pressure') }}" class="topic-card" style="background:linear-gradient(135deg,#ea580c,#fb923c);">
+                <i class="fa-solid fa-heart-pulse"></i><span>Blood Pressure</span>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

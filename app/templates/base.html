@@ -21,8 +21,11 @@
 
             <form class="search-bar" action="{{ url_for('main.search') }}" method="GET">
                 <i class="fa-solid fa-search search-icon"></i>
-                <input type="text" name="q" placeholder="Search health topics, symptoms, conditions..."
+                <input type="text" name="q" id="search-input" placeholder="Search health topics, symptoms, conditions..."
                        value="{{ request.args.get('q', '') }}" autocomplete="off">
+                <button type="button" class="voice-btn" id="voice-search-btn" onclick="startVoice('search-input')" title="Voice search">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
             </form>
 
             <div class="nav-links">
@@ -37,6 +40,9 @@
                 </a>
                 <a href="{{ url_for('stories.index') }}" class="nav-link {% if 'stories' in request.endpoint|default('') %}active{% endif %}">
                     <i class="fa-solid fa-book-open"></i> <span>Stories</span>
+                </a>
+                <a href="{{ url_for('main.nhs_lookup') }}" class="nav-link {% if request.endpoint == 'main.nhs_lookup' %}active{% endif %}">
+                    <i class="fa-solid fa-stethoscope"></i> <span>NHS</span>
                 </a>
                 {% if current_user.is_authenticated %}
                     <a href="{{ url_for('questions.ask') }}" class="btn btn-glow">
@@ -65,6 +71,9 @@
                     <a href="{{ url_for('auth.register') }}" class="btn btn-glow">Join Free</a>
                 {% endif %}
             </div>
+
+            <!-- GOOGLE TRANSLATE -->
+            <div id="google_translate_element" style="margin-left:auto;"></div>
 
             <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')">
                 <i class="fa-solid fa-bars"></i>
@@ -139,11 +148,104 @@
         </div>
     </footer>
 
+    <!-- GOOGLE TRANSLATE -->
+    <script>
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,hi,pl,ro,ur,bn,pa,ar,zh-CN,es,pt,fr,de,it,tr,ta,te,gu',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+    </script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>
         AOS.init({ duration: 600, once: true, offset: 50 });
-        // Auto-dismiss toasts
         document.querySelectorAll('.toast').forEach(t => setTimeout(() => t.remove(), 5000));
+
+        // === VOICE INPUT (Web Speech API) ===
+        function startVoice(targetId) {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Voice input is not supported in this browser. Try Chrome.');
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-GB';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            const btn = event.currentTarget;
+            btn.classList.add('voice-active');
+            btn.querySelector('i').className = 'fa-solid fa-circle-dot';
+
+            recognition.onresult = function(e) {
+                const text = e.results[0][0].transcript;
+                const input = document.getElementById(targetId);
+                if (input) {
+                    input.value = text;
+                    input.focus();
+                    // Auto-submit search
+                    if (targetId === 'search-input') {
+                        input.closest('form').submit();
+                    }
+                }
+            };
+            recognition.onend = function() {
+                btn.classList.remove('voice-active');
+                btn.querySelector('i').className = 'fa-solid fa-microphone';
+            };
+            recognition.onerror = function() {
+                btn.classList.remove('voice-active');
+                btn.querySelector('i').className = 'fa-solid fa-microphone';
+            };
+            recognition.start();
+        }
+
+        // === BROWSER PUSH NOTIFICATIONS ===
+        {% if current_user.is_authenticated %}
+        (function() {
+            if (!('Notification' in window)) return;
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+            let lastNotifId = 0;
+            function checkNotifications() {
+                fetch('/api/notifications/check')
+                    .then(r => r.json())
+                    .then(data => {
+                        // Update badge
+                        const badge = document.querySelector('.notif-badge');
+                        const bell = document.querySelector('.notif-bell');
+                        if (data.unread > 0) {
+                            if (badge) {
+                                badge.textContent = data.unread;
+                                badge.style.display = '';
+                            } else if (bell) {
+                                const b = document.createElement('span');
+                                b.className = 'notif-badge';
+                                b.textContent = data.unread;
+                                bell.appendChild(b);
+                            }
+                        }
+                        // Show browser notification for new ones
+                        if (data.latest && data.latest.id > lastNotifId && lastNotifId > 0 && Notification.permission === 'granted') {
+                            new Notification('MediAsk', {
+                                body: data.latest.message,
+                                icon: '/static/img/favicon.png'
+                            });
+                        }
+                        if (data.latest) lastNotifId = data.latest.id;
+                    })
+                    .catch(() => {});
+            }
+            checkNotifications();
+            setInterval(checkNotifications, 30000);
+        })();
+        {% endif %}
     </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block scripts %}{% endblock %}

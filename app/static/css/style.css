@@ -4,6 +4,62 @@
    Reddit-style Threaded Layout
    ============================================ */
 
+/* === VOICE INPUT BUTTON === */
+.voice-btn {
+    background: none;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.voice-btn:hover {
+    border-color: var(--nhs-blue);
+    color: var(--nhs-blue);
+    background: var(--nhs-blue-pale);
+}
+.voice-btn.voice-active {
+    border-color: #dc2626;
+    color: #dc2626;
+    background: #fef2f2;
+    animation: voice-pulse 1s infinite;
+}
+@keyframes voice-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+}
+
+/* === GOOGLE TRANSLATE TWEAKS === */
+#google_translate_element {
+    display: flex;
+    align-items: center;
+}
+#google_translate_element .goog-te-gadget {
+    font-size: 0 !important;
+}
+#google_translate_element .goog-te-gadget .goog-te-combo {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #334155;
+}
+.goog-te-banner-frame { display: none !important; }
+body { top: 0 !important; }
+
+/* === HAZARD STATUS BADGES === */
+.badge-submitted { background: #fef3c7; color: #92400e; }
+.badge-acknowledged { background: #dbeafe; color: #1e40af; }
+.badge-resolved { background: #dcfce7; color: #166534; }
+
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {

@@ -1,10 +1,11 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from app.main import bp
 from app import db
-from app.models import Question, Answer, Category, User, Vote, HazardReport
+from app.models import Question, Answer, Category, User, Vote, HazardReport, Notification
 from sqlalchemy import func
 import random
+import requests as http_requests
 
 # Daily question prompts to encourage participation
 DAILY_PROMPTS = [
@@ -214,6 +215,8 @@ def admin_dashboard():
         'total_users': User.query.filter_by(is_system_account=False).count(),
         'total_categories': Category.query.count(),
         'ai_answers': Answer.query.filter_by(auth_level='ai_assistant').count(),
+        'total_hazards': HazardReport.query.count(),
+        'open_hazards': HazardReport.query.filter(HazardReport.status != 'resolved').count(),
     }
 
     questions = Question.query.order_by(
@@ -224,14 +227,22 @@ def admin_dashboard():
         is_system_account=False
     ).order_by(User.created_at.desc()).paginate(page=page_u, per_page=15, error_out=False)
 
+    hazards = HazardReport.query.order_by(
+        HazardReport.created_at.desc()
+    ).all()
+
     categories = Category.query.order_by(Category.name).all()
+
+    active_tab = request.args.get('tab', 'questions')
 
     return render_template(
         'admin.html',
         stats=stats,
         questions=questions,
         users=users,
-        categories=categories
+        hazards=hazards,
+        categories=categories,
+        active_tab=active_tab
     )
 
 
@@ -279,3 +290,100 @@ def delete_user(id):
     db.session.commit()
     flash(f'User {user.full_name} has been deleted.', 'success')
     return redirect(url_for('main.admin_dashboard'))
+
+
+# ===== NOTIFICATION API (for browser push notifications) =====
+@bp.route('/api/notifications/check')
+@login_required
+def check_notifications():
+    unread = Notification.query.filter_by(
+        user_id=current_user.id, read=False
+    ).count()
+    latest = Notification.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Notification.created_at.desc()).first()
+    return jsonify({
+        'unread': unread,
+        'latest': {
+            'id': latest.id,
+            'message': latest.message,
+            'link': latest.link,
+            'type': latest.type
+        } if latest else None
+    })
+
+
+# ===== HAZARD REPORT MANAGEMENT =====
+@bp.route('/admin/hazard/<int:id>/update', methods=['POST'])
+@login_required
+def update_hazard(id):
+    if not current_user.is_admin:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.index'))
+    hazard = HazardReport.query.get_or_404(id)
+    new_status = request.form.get('status', hazard.status)
+    notes = request.form.get('resolved_notes', '')
+    hazard.status = new_status
+    if new_status == 'resolved':
+        hazard.resolved_by = current_user.full_name
+        hazard.resolved_notes = notes
+        from datetime import datetime, timezone
+        hazard.resolved_at = datetime.now(timezone.utc)
+    elif new_status == 'acknowledged':
+        hazard.resolved_notes = notes
+    db.session.commit()
+    flash(f'Hazard report #{hazard.id} updated to {new_status}.', 'success')
+    return redirect(url_for('main.admin_dashboard') + '?tab=hazards')
+
+
+# ===== NHS API INTEGRATION =====
+NHS_API_BASE = 'https://api.nhs.uk/conditions'
+NHS_API_HEADERS = {'subscription-key': 'placeholder', 'Content-Type': 'application/json'}
+
+
+@bp.route('/nhs-lookup')
+def nhs_lookup():
+    query = request.args.get('q', '').strip()
+    results = []
+    error = None
+    if query:
+        try:
+            resp = http_requests.get(
+                NHS_API_BASE,
+                params={'category': query},
+                headers=NHS_API_HEADERS,
+                timeout=5
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                for item in data.get('significantLink', data.get('relatedLink', []))[:10]:
+                    results.append({
+                        'name': item.get('name', ''),
+                        'description': item.get('description', ''),
+                        'url': item.get('url', ''),
+                    })
+            else:
+                # Fallback: use local search
+                error = 'NHS API unavailable, showing local results'
+                local = Question.query.filter(
+                    Question.title.ilike(f'%{query}%')
+                ).limit(10).all()
+                for q in local:
+                    results.append({
+                        'name': q.title,
+                        'description': q.body[:200],
+                        'url': url_for('questions.detail', id=q.id),
+                    })
+        except Exception:
+            error = 'NHS API unavailable, showing local results'
+            local = Question.query.filter(
+                Question.title.ilike(f'%{query}%')
+            ).limit(10).all()
+            for q in local:
+                results.append({
+                    'name': q.title,
+                    'description': q.body[:200],
+                    'url': url_for('questions.detail', id=q.id),
+                })
+    categories = Category.query.order_by(Category.name).all()
+    return render_template('nhs_lookup.html', query=query, results=results, error=error, categories=categories)

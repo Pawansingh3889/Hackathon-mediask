@@ -21,7 +21,12 @@
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.title.label }}
-            {{ form.title(class="form-control", placeholder="e.g. What are the symptoms of anxiety?") }}
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                {{ form.title(class="form-control", id="ask-title", placeholder="e.g. What are the symptoms of anxiety?", style="flex:1;") }}
+                <button type="button" class="voice-btn" onclick="startVoice('ask-title')" title="Speak your question">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+            </div>
             {% for error in form.title.errors %}
                 <span class="form-error">{{ error }}</span>
             {% endfor %}
