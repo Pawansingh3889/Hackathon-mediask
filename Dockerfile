@@ -15,8 +15,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app code with correct ownership
 COPY --chown=user . /app
 
-# Make the startup script executable
-RUN chmod +x start.sh
+# Make the startup script executable and ensure /app + /app/instance
+# are owned by user (Flask creates an "instance" dir at runtime for
+# session files / SQLite fallback, and WORKDIR /app was root-owned)
+RUN chmod +x start.sh \
+ && mkdir -p /app/instance \
+ && chown -R user:user /app
 
 # Switch to the non-root user before running
 USER user
