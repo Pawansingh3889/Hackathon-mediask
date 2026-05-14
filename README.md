@@ -1,6 +1,17 @@
+---
+title: MediAsk
+emoji: 🩺
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+app_port: 7860
+short_description: Health Q&A for factory workers, NHS guidance plus AI
+---
+
 # MediAsk - Health Q&A for Workers
 
-**Live Demo:** [hackathon-ioqp.onrender.com](https://hackathon-ioqp.onrender.com)
+**Live Demo:** [pawankapkoti-mediask.hf.space](https://pawankapkoti-mediask.hf.space)
 
 MediAsk is a community health Q&A platform designed for factory workers, food processors, and manual labourers in the UK. It combines NHS-verified guidance, real worker experiences, and AI-powered responses to answer health questions that matter most to working people.
 

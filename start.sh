@@ -31,5 +31,5 @@ unset SKIP_GEMINI_SEED
 
 echo "=== Seeding complete, starting server ==="
 
-# Start gunicorn
-exec gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 run:app
+# Start gunicorn (port 7860 for Hugging Face Spaces, was 5000 on Render)
+exec gunicorn --bind 0.0.0.0:7860 --workers 2 --timeout 120 run:app
